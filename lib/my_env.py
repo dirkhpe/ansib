@@ -114,6 +114,21 @@ def get_inifile(projectname):
     return ini_config
 
 
+def clean(attrib):
+    """
+    This method replaces special characters with an underscore and returns name in lowercase.
+    For now . is replaced with _
+
+    :param attrib: name that requires cleaning.
+    :return: cleaned attrib name
+    """
+    if attrib == '_':
+        attrib = 'underscore_only'
+    elif attrib.lower() == 'id':
+        attrib = 'id_from_ansible'
+    return attrib.replace('.', '_').replace('(', '_').replace(')', '_').lower()
+
+
 def run_script(path, script_name, *args):
     """
     This function will run a python script with arguments.

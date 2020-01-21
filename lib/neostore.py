@@ -14,7 +14,7 @@ class NeoStore:
         """
         Method to instantiate the class in an object for the neostore module.
 
-        :param refresh: Database refresh required? (No: default)
+        :param refresh: Database refresh required? No: default, Yes to refresh the database.
         """
         logging.debug("Initializing Neostore object")
         self.graph = self._connect2db()
@@ -47,6 +47,24 @@ class NeoStore:
         # Check that we are connected to the expected Neo4J Store - to avoid accidents...
         return graph
 
+    def get_attribs(self, start_node=None):
+        """
+        This method returns all attributes for a table. These are nodes at the end of the 'has_attrib' link and they do
+        not have a start 'has_attrib' link.
+
+        :param start_node: start node - Representing the table.
+        :return: List of end nodes that do not have an outgoing 'has_attrib' link.
+        """
+        if not isinstance(start_node, Node):
+            logging.error(f"Start node not of type node, {type(start_node)} instead")
+            return False
+        query = """
+        MATCH (start_node {{nid:'{nid}'}})-[:has_attrib]->(end_node)
+        WHERE NOT (end_node)-[:has_attrib]->()
+        RETURN end_node
+        """.format(nid=start_node['nid'])
+        return self.graph.run(query)
+
     def get_endnode(self, start_node=None, rel_type=None):
         """
         This method will calculate the end node from a start Node and a relation type. If relation type is not specified
@@ -76,6 +94,7 @@ class NeoStore:
         This method will calculate all end nodes from a start Node and a relation type. If relation type is not
         specified then any relation type will do.
         The purpose of the function is to find all end nodes.
+
         :param start_node: Start node.
         :param rel_type: Relation type
         :return: List with End Nodes.
@@ -90,9 +109,28 @@ class NeoStore:
         # Then return the result as a list
         return list(node_set)
 
+    def get_tables(self, start_node=None):
+        """
+        This method returns all table links for a table. These are nodes at the end of the 'has_attrib' link that have
+        a start 'has_attrib' link.
+
+        :param start_node: start node - Representing the table.
+        :return: List of end nodes that have an outgoing 'has_attrib' link.
+        """
+        if not isinstance(start_node, Node):
+            logging.error(f"Start node not of type node, {type(start_node)} instead")
+            return False
+        query = """
+        MATCH (start_node {{nid:'{nid}'}})-[:has_attrib]->(end_node)
+        WHERE (end_node)-[:has_attrib]->()
+        RETURN end_node
+        """.format(nid=start_node['nid'])
+        return self.graph.run(query)
+
     def create_node(self, *labels, **props):
         """
         Function to create node. The function will return the node object.
+
         :param labels: Labels for the node
         :param props: Value dictionary with values for the node.
         :return: node object
@@ -106,9 +144,10 @@ class NeoStore:
     def create_relation(self, from_node, rel, to_node):
         """
         Function to create relationship between nodes. If the relation exists already, it will not be created again.
-        :param from_node:
-        :param rel:
-        :param to_node:
+
+        :param from_node: Node where relation starts
+        :param rel: relation identifier
+        :param to_node: Node where relation ends.
         :return:
         """
         rel = Relationship(from_node, rel, to_node)
@@ -119,6 +158,7 @@ class NeoStore:
         """
         Function to remove all nodes and relations from the graph database.
         Then create calendar object.
+
         :return:
         """
         logging.info("Remove all nodes and relations from database.")
@@ -128,6 +168,7 @@ class NeoStore:
     def get_nodes(self, *labels, **props):
         """
         This method will select all nodes that have labels and properties
+
         :param labels:
         :param props:
         :return: list of nodes that fulfill the criteria, or False if no nodes are found.
@@ -143,6 +184,7 @@ class NeoStore:
     def get_query(self, query, **kwargs):
         """
         This method accepts a Cypher query and returns the result as a cursor.
+
         :param query: Cypher Query to run
         :param kwargs: Optional Keyword parameters for the query.
         :return: Result of the Cypher Query as a cursor.
@@ -152,6 +194,7 @@ class NeoStore:
     def get_query_data(self, query, **kwargs):
         """
         This method accepts a Cypher query and returns the result as a list of dictionaries.
+
         :param query: Cypher Query to run
         :param kwargs: Optional Keyword parameters for the query.
         :return: Result of the Cypher Query as a list of dictionaries.
@@ -161,6 +204,7 @@ class NeoStore:
     def get_query_df(self, query, **kwargs):
         """
         This method accepts a Cypher query and returns the result as a pandas dataframe.
+
         :param query: Cypher Query to run
         :param kwargs: Optional Keyword parameters for the query.
         :return: Result of the Cypher Query as a pandas dataframe.
