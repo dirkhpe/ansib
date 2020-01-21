@@ -1,5 +1,6 @@
 """
 Purpose of the script is to get a JSON file and extract the structure of it into Neo4J database.
+Check for git.
 """
 
 import json
