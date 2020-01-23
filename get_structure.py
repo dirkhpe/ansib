@@ -16,14 +16,15 @@ def get_attributes(sn, parent_table=None):
     :param parent_table: table name of the parent table where current table links to.
     :return:
     """
-    table_name = next(iter(sn.labels))
+    table_name = my_env.clean(next(iter(sn.labels)))
     attribs = []
     cursor = ns.get_attribs(sn)
     while cursor.forward():
         rec = cursor.current
         node = rec['end_node']
-        attrib = next(iter(node.labels))
-        attribs.append(attrib)
+        attrib = my_env.clean(next(iter(node.labels)))
+        if attrib not in attribs:
+            attribs.append(attrib)
     cols = ' text,'.join(attribs)
     col_str = f"id integer PRIMARY KEY AUTOINCREMENT, {cols} text"
     if parent_table:
@@ -46,7 +47,7 @@ def get_tables(sn):
     :param sn: Start node
     :return:
     """
-    parent_table = next(iter(sn.labels))
+    parent_table = my_env.clean(next(iter(sn.labels)))
     cursor = ns.get_tables(sn)
     while cursor.forward():
         rec = cursor.current

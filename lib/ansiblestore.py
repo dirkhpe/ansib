@@ -66,16 +66,16 @@ class SqliteUtils:
 
         :param tablename: Table Name to insert data into
         :param rowdict: Row Dictionary
-        :return:
+        :return: Row ID of the last row inserted.
         """
         columns = ", ".join("`" + k + "`" for k in rowdict.keys())
         values_template = ", ".join(["?"] * len(rowdict.keys()))
         query = "insert into {tn} ({cols}) values ({vt})".format(tn=tablename, cols=columns, vt=values_template)
         values = tuple(rowdict[key] for key in rowdict.keys())
         logging.debug("Insert query: {q}".format(q=query))
-        self.dbConn.execute(query, values)
+        self.cur.execute(query, values)
         self.dbConn.commit()
-        return
+        return self.cur.lastrowid
 
     def insert_rows(self, tablename, rowdict):
         """

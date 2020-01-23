@@ -14,6 +14,10 @@ import subprocess
 from datetime import datetime
 from dotenv import load_dotenv
 
+attrib_sub = dict(partitions='partition')
+attrib_stop = ['ansible_bond', 'ansible_ce', 'ansible_eth', 'ansible_lo', 'ansible_vnet', 'ansible_devices',
+               'ansible_device_links', 'ansible_mounts']
+
 
 def init_env(projectname, filename):
     """
@@ -127,6 +131,19 @@ def clean(attrib):
     elif attrib.lower() == 'id':
         attrib = 'id_from_ansible'
     return attrib.replace('.', '_').replace('(', '_').replace(')', '_').lower()
+
+
+def in_attrib_stop(attr):
+    """
+    This function checks if attribute is in the attrib_stop list. If so, return TRUE else return FALSE.
+
+    :param attr: Attribute string to be verified. If start-subset is in attrib_stop then no need to further investigate.
+    :return: True: in attrib_stop list. False: not in attrib_stop list.
+    """
+    for val in attrib_stop:
+        if attr[:len(val)] == val:
+            return True
+    return False
 
 
 def run_script(path, script_name, *args):
