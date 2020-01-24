@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 attrib_sub = dict(partitions='partition')
 attrib_stop = ['ansible_bond', 'ansible_ce', 'ansible_eth', 'ansible_lo', 'ansible_vnet', 'ansible_devices',
                'ansible_device_links', 'ansible_mounts']
+attrib_go = ['ansible_local']
 
 
 def init_env(projectname, filename):
@@ -138,12 +139,15 @@ def in_attrib_stop(attr):
     This function checks if attribute is in the attrib_stop list. If so, return TRUE else return FALSE.
 
     :param attr: Attribute string to be verified. If start-subset is in attrib_stop then no need to further investigate.
-    :return: True: in attrib_stop list. False: not in attrib_stop list.
+    :return: True: in attrib_stop list. False: not in attrib_stop list, continue processing.
     """
-    for val in attrib_stop:
-        if attr[:len(val)] == val:
-            return True
-    return False
+    if attr in attrib_go:
+        return False
+    else:
+        for val in attrib_stop:
+            if attr[:len(val)] == val:
+                return True
+        return False
 
 
 def run_script(path, script_name, *args):

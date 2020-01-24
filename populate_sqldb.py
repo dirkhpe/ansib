@@ -46,12 +46,11 @@ def handle_dict(diction, this_table, **table_props):
     return
 
 
-def get_attributes(sn, parent_table=None):
+def get_attributes(sn):
     """
     This module will get the attributes from a table and add the attributes as a list to the table.
 
     :param sn: Start node for the table.
-    :param parent_table: table name of the parent table where current table links to.
     :return:
     """
     table_name = next(iter(sn.labels))
@@ -83,7 +82,7 @@ def get_tables(sn):
         node = rec['end_node']
         table = next(iter(node.labels))
         tables.append(table)
-        get_attributes(node, parent_table)
+        get_attributes(node)
     linked_tables[parent_table] = tables
     return
 
