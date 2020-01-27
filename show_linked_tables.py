@@ -25,13 +25,13 @@ def get_tables(sn):
     :param sn: Start node
     :return:
     """
-    parent_table = next(iter(sn.labels))
+    parent_table = ns.get_unique_tn(sn)
     tables = []
     cursor = ns.get_tables(sn)
     while cursor.forward():
         rec = cursor.current
         node = rec['end_node']
-        table = next(iter(node.labels))
+        table = ns.get_unique_tn(node)
         tables.append(table)
         get_attributes(node)
     linked_tables[parent_table] = tables
@@ -52,6 +52,6 @@ linked_tables = {}
 start_node = ns.get_nodes('server')[0]
 get_attributes(start_node)
 
-for item in linked_tables:
+for item in sorted(linked_tables.keys()):
     print(f"{item}: {linked_tables[item]}")
 logging.info("End Application")

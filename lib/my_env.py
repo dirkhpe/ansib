@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 
 attrib_sub = dict(partitions='partition')
 attrib_stop = ['ansible_bond', 'ansible_ce', 'ansible_eth', 'ansible_lo', 'ansible_vnet', 'ansible_devices',
-               'ansible_device_links', 'ansible_mounts']
+               'ansible_device_links', 'ansible_mounts', 'test', 'oracle_test']
 attrib_go = ['ansible_local']
 
 

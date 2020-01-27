@@ -16,7 +16,7 @@ def get_attributes(sn, parent_table=None):
     :param parent_table: table name of the parent table where current table links to.
     :return:
     """
-    table_name = my_env.clean(next(iter(sn.labels)))
+    table_name = ns.get_unique_tn(sn)
     attribs = []
     cursor = ns.get_attribs(sn)
     while cursor.forward():
@@ -47,7 +47,7 @@ def get_tables(sn):
     :param sn: Start node
     :return:
     """
-    parent_table = my_env.clean(next(iter(sn.labels)))
+    parent_table = ns.get_unique_tn(sn)
     cursor = ns.get_tables(sn)
     while cursor.forward():
         rec = cursor.current

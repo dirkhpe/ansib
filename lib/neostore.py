@@ -5,6 +5,7 @@ This class consolidates functions related to the neo4J datastore.
 import logging
 import os
 import uuid
+from lib.my_env import clean
 from py2neo import Database, Graph, Node, Relationship, NodeMatcher, RelationshipMatch
 
 
@@ -210,3 +211,28 @@ class NeoStore:
         :return: Result of the Cypher Query as a pandas dataframe.
         """
         return self.get_query(query, **kwargs).to_data_frame()
+
+    def get_unique_tn(self, node):
+        """
+        This method returns a unique tablename for a node. If the node label is unique, then this is returned. If the
+        node label is not unique then the parent's node label is prepended to the node label.
+
+        :param node: node that need to be converted into a table name.
+        :return:
+        """
+        # Get label for this node
+        label = next(iter(node.labels))
+        # Count number of nodes with this label
+        query = f"MATCH (n:`{label}`) RETURN count(n) as cnt"
+        res = self.get_query_data(query)
+        cnt = res[0]['cnt']
+        if cnt > 1:
+            query = "MATCH (parent)-[:has_attrib]->(n {{nid:'{nid}'}}) RETURN parent".format(nid=node['nid'])
+            cursor = self.graph.run(query)
+            rec = next(iter(cursor))
+            parent = rec['parent']
+            parent_lbl = self.get_unique_tn(parent)
+            tn = f"{parent_lbl}_{label}"
+        else:
+            tn = label
+        return clean(tn)

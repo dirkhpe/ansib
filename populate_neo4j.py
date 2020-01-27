@@ -40,7 +40,12 @@ def handle_dict(diction, parent):
             if isinstance(diction[k], dict):
                 parent_node = attribs[attrib_name]
                 handle_dict(diction[k], parent_node)
-            # To do: Handle case where diction[k] is list, ignore string and flag other possibilities as error.
+            elif isinstance(diction[k], list):
+                for elem in diction[k]:
+                    if isinstance(elem, dict):
+                        parent_node = attribs[attrib_name]
+                        handle_dict(elem, parent_node)
+            # To do: Handle case where diction[k] is list of strings (not a list of dictionaries.
     return
 
 
