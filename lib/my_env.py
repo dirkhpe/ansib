@@ -131,6 +131,8 @@ def clean(attrib):
         attrib = 'underscore_only'
     elif attrib.lower() == 'id':
         attrib = 'id_from_ansible'
+    elif attrib.lower() == 'primary':
+        attrib = 'interf_primary'
     return attrib.replace('.', '_').replace('(', '_').replace(')', '_').lower()
 
 
